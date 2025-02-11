@@ -68,15 +68,7 @@ const SortableHeader = <TData,>({
   )
 }
 
-type IncidentKeys = keyof Incident
-type TypedColumnDef<TData, TKey extends keyof TData> = Omit<
-  ColumnDef<TData>,
-  'accessorKey'
-> & {
-  accessorKey: TKey
-}
-
-const columns: TypedColumnDef<Incident, IncidentKeys>[] = [
+const columns: ColumnDef<Incident>[] = [
   {
     id: 'expand',
     header: () => null,
