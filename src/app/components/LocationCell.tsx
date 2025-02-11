@@ -1,11 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import dynamic from 'next/dynamic'
 import type { Incident } from '../store/attackStore'
 import { useTheme } from 'next-themes'
-import 'leaflet/dist/leaflet.css'
 import type { MapOptions } from 'leaflet'
+
+const Map = dynamic(
+  () =>
+    import('./Map').then((mod) => mod.Map),
+  { ssr: false }
+)
 
 interface LocationCellProps {
   location: string
@@ -45,24 +50,15 @@ export function LocationCell({
 
   return (
     <div className="h-64 w-full overflow-hidden rounded">
-      <MapContainer {...mapOptions} style={{ height: '100%', width: '100%' }}>
-        <TileLayer
-          url={
-            isDark
-              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-              : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-          }
-        />
-        <Marker position={[lat, lng]}>
-          <Popup>
-            <div className="text-sm">
-              <p className="font-bold">{location}</p>
-              <p>Date: {incident.date}</p>
-              <p>Time: {incident.time}</p>
-            </div>
-          </Popup>
-        </Marker>
-      </MapContainer>
+      <Map
+        mapOptions={mapOptions}
+        style={{ height: '100%', width: '100%' }}
+        isDark={isDark}
+        lat={lat}
+        lng={lng}
+        location={location}
+        incident={incident}
+      />
     </div>
   )
 }
