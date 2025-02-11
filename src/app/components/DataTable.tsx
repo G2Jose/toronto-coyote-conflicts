@@ -179,7 +179,6 @@ function ExpandedRow({ incident }: { incident: Incident }) {
         <div className="col-span-2 flex flex-col">
           <h4 className="font-semibold mb-2">Location</h4>
           <LocationCell
-            location={incident.location}
             lat={incident.lat}
             lng={incident.lng}
             incident={incident}
