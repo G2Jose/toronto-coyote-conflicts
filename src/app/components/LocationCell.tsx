@@ -6,11 +6,9 @@ import type { Incident } from '../store/attackStore'
 import { useTheme } from 'next-themes'
 import type { MapOptions } from 'leaflet'
 
-const Map = dynamic(
-  () =>
-    import('./Map').then((mod) => mod.Map),
-  { ssr: false }
-)
+const Map = dynamic(() => import('./Map').then((mod) => mod.Map), {
+  ssr: false,
+})
 
 interface LocationCellProps {
   location: string
@@ -56,8 +54,8 @@ export function LocationCell({
         isDark={isDark}
         lat={lat}
         lng={lng}
-        location={location}
         incident={incident}
+        location={location}
       />
     </div>
   )

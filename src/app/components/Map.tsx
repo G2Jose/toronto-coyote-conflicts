@@ -43,6 +43,7 @@ interface MapProps {
   lat: number
   lng: number
   incident: Incident
+  location: string
 }
 
 export function Map({
