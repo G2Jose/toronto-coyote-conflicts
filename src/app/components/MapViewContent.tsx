@@ -1,14 +1,7 @@
 'use client'
 
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet'
-import type { MapOptions, LocationEvent } from 'leaflet'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/attackStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
@@ -21,6 +14,26 @@ declare global {
   interface Window {
     filteredAttacks?: Incident[]
   }
+}
+
+// Extend Element type to include Leaflet's internal property
+declare global {
+  interface Element {
+    _leaflet_map?: LeafletMap
+  }
+}
+
+interface LeafletMap {
+  locate: (options: { setView: boolean; maxZoom: number }) => LeafletMap
+  on: (
+    event: 'locationerror' | 'locationfound',
+    callback: (e: LocationEvent) => void
+  ) => LeafletMap
+  setView: (latlng: [number, number], zoom: number) => void
+}
+
+interface LocationEvent {
+  latlng: [number, number]
 }
 
 function IncidentDetails({ incident }: { incident: Incident }) {
@@ -50,54 +63,13 @@ function IncidentDetails({ incident }: { incident: Incident }) {
   )
 }
 
-function LocationControl() {
-  const map = useMap()
-
-  const handleLocate = () => {
-    map
-      .locate({
-        setView: true,
-        maxZoom: 13,
-      })
-      .on('locationerror', () => {
-        // If location not found, center on first incident
-        const attacks = window.filteredAttacks || []
-        if (attacks.length > 0) {
-          const firstIncident = attacks[0]
-          map.setView([firstIncident.lat, firstIncident.lng], 13)
-        }
-      })
-  }
-
-  useMapEvents({
-    locationfound(e: LocationEvent) {
-      map.setView(e.latlng, 13)
-    },
-  })
-
-  return (
-    <div className="leaflet-bottom leaflet-right p-4">
-      <Button
-        variant="secondary"
-        size="icon"
-        onClick={handleLocate}
-        className="h-10 w-10 rounded-full shadow-lg"
-      >
-        <Locate className="h-4 w-4" />
-      </Button>
-    </div>
-  )
-}
-
 interface MapViewContentProps {
   mapOptions: MapOptions
-  isDark: boolean
   filteredAttacks: Incident[]
 }
 
 export function MapViewContent({
   mapOptions,
-  isDark,
   filteredAttacks,
 }: MapViewContentProps) {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(
@@ -112,14 +84,12 @@ export function MapViewContent({
   return (
     <>
       <div className="relative h-full">
-        <MapContainer {...mapOptions} style={{ height: '100%', width: '100%' }}>
-          <TileLayer
-            url={
-              isDark
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-            }
-          />
+        <MapContainer
+          {...mapOptions}
+          style={{ height: '100%', width: '100%' }}
+          className="z-0"
+        >
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
           {filteredAttacks.map((attack) => (
             <Marker
               key={attack.id}
@@ -131,15 +101,44 @@ export function MapViewContent({
               <Popup>
                 <div className="text-sm text-center">
                   <p className="font-medium">
-                    {dayjs(attack.date).format('MMM DD YYYY')}
+                    {dayjs(attack.date).format('MMM DD')}
                   </p>
                   <p>{attack.time}</p>
                 </div>
               </Popup>
             </Marker>
           ))}
-          <LocationControl />
         </MapContainer>
+        <div className="absolute bottom-4 right-4 z-[400]">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => {
+              const map =
+                document.querySelector('.leaflet-container')?._leaflet_map
+              if (map) {
+                map
+                  .locate({
+                    setView: true,
+                    maxZoom: 13,
+                  })
+                  .on('locationerror', () => {
+                    // If location not found, center on first incident
+                    if (filteredAttacks.length > 0) {
+                      const firstIncident = filteredAttacks[0]
+                      map.setView([firstIncident.lat, firstIncident.lng], 13)
+                    }
+                  })
+                  .on('locationfound', (e: LocationEvent) => {
+                    map.setView(e.latlng, 13)
+                  })
+              }
+            }}
+            className="h-10 w-10 rounded-full shadow-lg hover:bg-accent"
+          >
+            <Locate className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <Drawer.Root

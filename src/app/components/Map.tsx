@@ -39,34 +39,19 @@ function IncidentDetails({ incident }: { incident: Incident }) {
 interface MapProps {
   mapOptions: MapOptions
   style: { height: string; width: string }
-  isDark: boolean
   lat: number
   lng: number
   incident: Incident
-  location: string
 }
 
-export function Map({
-  mapOptions,
-  style,
-  isDark,
-  lat,
-  lng,
-  incident,
-}: MapProps) {
+export function Map({ mapOptions, style, lat, lng, incident }: MapProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
   return (
     <>
       <div className="relative h-full">
         <MapContainer {...mapOptions} style={style}>
-          <TileLayer
-            url={
-              isDark
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-            }
-          />
+          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
           <Marker
             position={[lat, lng]}
             eventHandlers={{

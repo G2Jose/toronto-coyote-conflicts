@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type { Incident } from '../store/attackStore'
-import { useTheme } from 'next-themes'
 import type { MapOptions } from 'leaflet'
 
 const Map = dynamic(() => import('./Map').then((mod) => mod.Map), {
@@ -11,19 +10,12 @@ const Map = dynamic(() => import('./Map').then((mod) => mod.Map), {
 })
 
 interface LocationCellProps {
-  location: string
   lat: number
   lng: number
   incident: Incident
 }
 
-export function LocationCell({
-  location,
-  lat,
-  lng,
-  incident,
-}: LocationCellProps) {
-  const { theme } = useTheme()
+export function LocationCell({ lat, lng, incident }: LocationCellProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -33,8 +25,6 @@ export function LocationCell({
   if (!mounted) {
     return <div className="h-64 w-full bg-muted" />
   }
-
-  const isDark = theme === 'dark'
 
   const mapOptions: MapOptions = {
     center: [lat, lng],
@@ -51,11 +41,9 @@ export function LocationCell({
       <Map
         mapOptions={mapOptions}
         style={{ height: '100%', width: '100%' }}
-        isDark={isDark}
         lat={lat}
         lng={lng}
         incident={incident}
-        location={location}
       />
     </div>
   )
