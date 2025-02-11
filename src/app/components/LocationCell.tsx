@@ -40,15 +40,12 @@ export function LocationCell({
     attributionControl: false,
     dragging: false,
     scrollWheelZoom: false,
-    doubleClickZoom: false
+    doubleClickZoom: false,
   }
 
   return (
     <div className="h-64 w-full overflow-hidden rounded">
-      <MapContainer
-        {...mapOptions}
-        style={{ height: '100%', width: '100%' }}
-      >
+      <MapContainer {...mapOptions} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={
             isDark

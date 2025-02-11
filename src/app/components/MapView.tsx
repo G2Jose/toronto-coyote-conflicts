@@ -21,16 +21,18 @@ function LocationControl() {
   const { filteredAttacks } = useAttackStore()
 
   const handleLocate = () => {
-    map.locate({
-      setView: true,
-      maxZoom: 13,
-    }).on('locationerror', () => {
-      // If location not found, center on first incident
-      if (filteredAttacks.length > 0) {
-        const firstIncident = filteredAttacks[0]
-        map.setView([firstIncident.lat, firstIncident.lng], 13)
-      }
-    })
+    map
+      .locate({
+        setView: true,
+        maxZoom: 13,
+      })
+      .on('locationerror', () => {
+        // If location not found, center on first incident
+        if (filteredAttacks.length > 0) {
+          const firstIncident = filteredAttacks[0]
+          map.setView([firstIncident.lat, firstIncident.lng], 13)
+        }
+      })
   }
 
   useMapEvents({
@@ -70,15 +72,12 @@ export function MapView() {
 
   const mapOptions: MapOptions = {
     center: [43.6532, -79.3832],
-    zoom: 13
+    zoom: 13,
   }
 
   return (
     <div className="h-[calc(100vh-120px)] w-full rounded-lg overflow-hidden shadow-lg">
-      <MapContainer
-        {...mapOptions}
-        style={{ height: '100%', width: '100%' }}
-      >
+      <MapContainer {...mapOptions} style={{ height: '100%', width: '100%' }}>
         <TileLayer
           url={
             isDark

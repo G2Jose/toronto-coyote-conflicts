@@ -176,12 +176,6 @@ const columns: TypedColumnDef<Incident, IncidentKeys>[] = [
   },
 ] as const
 
-type IncidentCell<K extends keyof Incident> = {
-  row: {
-    getValue<T extends K>(key: T): Incident[T]
-  }
-}
-
 function ExpandedRow({ incident }: { incident: Incident }) {
   return (
     <div className="p-4 bg-muted/50">
