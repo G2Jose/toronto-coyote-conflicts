@@ -11,7 +11,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 export default function Home() {
   const {
     setIncidents: setAttacks,
-    setFilteredAttacks,
     selectedIncidentId,
     setSelectedIncidentId,
   } = incidentStore()
@@ -25,7 +24,6 @@ export default function Home() {
     const loadAttacks = async () => {
       const attacks = await fetchAttacks()
       setAttacks(attacks)
-      setFilteredAttacks(attacks)
 
       // Check for incident ID in URL
       const incidentId = searchParams.get('incident')
@@ -36,7 +34,7 @@ export default function Home() {
     }
     loadAttacks()
     setMounted(true)
-  }, [setAttacks, setFilteredAttacks, searchParams, setSelectedIncidentId])
+  }, [setAttacks, searchParams, setSelectedIncidentId])
 
   // Update URL when selected incident changes
   useEffect(() => {

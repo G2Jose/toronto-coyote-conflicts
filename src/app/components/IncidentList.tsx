@@ -1,6 +1,6 @@
 'use client'
 
-import { incidentStore } from '../store/incidentStore'
+import { incidentStore, getFilteredIncidents } from '../store/incidentStore'
 import { formatDate } from '@/app/utils'
 import { Input } from '@/components/ui/input'
 import { useState, useMemo } from 'react'
@@ -213,7 +213,8 @@ function IncidentCard({ incident }: { incident: Incident }) {
 }
 
 export function IncidentList() {
-  const { filteredAttacks } = incidentStore()
+  const store = incidentStore()
+  const filteredAttacks = getFilteredIncidents(store)
   const [searchQuery, setSearchQuery] = useState('')
 
   const searchFilteredIncidents = filteredAttacks.filter((incident) => {
