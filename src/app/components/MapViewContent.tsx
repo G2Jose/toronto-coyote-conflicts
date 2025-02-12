@@ -5,11 +5,11 @@ import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/attackStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
-import { Drawer } from 'vaul'
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { formatDate } from '@/app/utils'
 import { useAttackStore } from '../store/attackStore'
+import type { LeafletEvent, LocationEvent } from 'leaflet'
 
 declare global {
   interface Window {
@@ -28,40 +28,9 @@ interface LeafletMap {
   locate: (options: { setView: boolean; maxZoom: number }) => LeafletMap
   on: (
     event: 'locationerror' | 'locationfound',
-    callback: (e: LocationEvent) => void
+    callback: (e: LeafletEvent | LocationEvent) => void
   ) => LeafletMap
   setView: (latlng: [number, number], zoom: number) => void
-}
-
-interface LocationEvent {
-  latlng: [number, number]
-}
-
-function IncidentDetails({ incident }: { incident: Incident }) {
-  return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">{incident.location}</h2>
-      <div className="space-y-4">
-        <div>
-          <h3 className="font-semibold mb-2">Incident Details</h3>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            <p>Date: {formatDate(incident.date)}</p>
-            <p>Time: {incident.time}</p>
-            <p>Dog Breed: {incident.dogBreed}</p>
-            <p>Dog Weight: {incident.dogWeightLb} lbs</p>
-            <p>Was Leashed: {incident.wasLeashed}</p>
-            <p>Coyotes Involved: {incident.numCoyotes}</p>
-          </div>
-        </div>
-        {incident.notes && (
-          <div>
-            <h3 className="font-semibold mb-2">Notes</h3>
-            <p className="whitespace-pre-line">{incident.notes}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  )
 }
 
 // Component to handle map updates
@@ -98,10 +67,19 @@ export function MapViewContent({
 }: MapViewContentProps) {
   const { selectedIncidentId, setSelectedIncidentId } = useAttackStore()
 
-  // Store map reference when mounted
-  const handleMapMount = (map: LeafletMap) => {
-    // Implementation of handleMapMount
-  }
+  // Group incidents by coordinates to handle overlapping markers
+  const markerGroups = useMemo(() => {
+    const groups = new Map<string, Incident[]>()
+    filteredAttacks.forEach((attack) => {
+      if (!attack.coordinates) return
+      const key = attack.coordinates
+      if (!groups.has(key)) {
+        groups.set(key, [])
+      }
+      groups.get(key)!.push(attack)
+    })
+    return groups
+  }, [filteredAttacks])
 
   // Store filteredAttacks in window for LocationControl to access
   if (typeof window !== 'undefined') {
@@ -109,78 +87,88 @@ export function MapViewContent({
   }
 
   return (
-    <>
-      <div className="relative h-full">
-        <MapContainer
-          {...mapOptions}
-          style={{ height: '100%', width: '100%' }}
-          className="z-0"
-        >
-          <MapController
-            selectedId={selectedIncidentId}
-            incidents={filteredAttacks}
-          />
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          {filteredAttacks.map((attack) => {
-            if (!attack.coordinates) return null
-            const [lat, lng] = attack.coordinates.split(',').map(Number)
-            const isSelected = attack.id === selectedIncidentId
+    <div className="relative h-full w-full">
+      <MapContainer
+        {...mapOptions}
+        style={{ height: '100%', width: '100%' }}
+        attributionControl={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        />
+        {Array.from(markerGroups.entries()).map(([coords, incidents]) => {
+          const [lat, lng] = coords.split(',').map(Number)
+          const totalIncidents = incidents.length
+          const radius = 0.0001 // Much smaller radius for marker offset
+
+          return incidents.map((incident, index) => {
+            // Calculate offset angle and position for multiple markers
+            const angle = (index * 2 * Math.PI) / totalIncidents
+            const offsetX = totalIncidents > 1 ? Math.cos(angle) * radius : 0
+            const offsetY = totalIncidents > 1 ? Math.sin(angle) * radius : 0
 
             return (
               <Marker
-                key={attack.id}
-                position={[lat, lng]}
+                key={incident.id}
+                position={[lat + offsetY, lng + offsetX]}
                 eventHandlers={{
                   click: () => {
-                    setSelectedIncidentId(attack.id)
+                    setSelectedIncidentId(incident.id)
                   },
                 }}
-                opacity={isSelected ? 1 : 0.6}
               >
                 <Popup>
-                  <div className="text-sm text-center">
-                    <p className="font-medium">{formatDate(attack.date)}</p>
-                    <p>{attack.time}</p>
+                  <div className="flex flex-col gap-2">
+                    <p className="font-medium">{formatDate(incident.date)}</p>
+                    {totalIncidents > 1 && (
+                      <p className="text-sm text-muted-foreground">
+                        {totalIncidents} incidents at this location
+                      </p>
+                    )}
                   </div>
                 </Popup>
               </Marker>
             )
-          })}
-        </MapContainer>
-        <div className="absolute bottom-4 right-4 z-[400]">
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={() => {
-              const map =
-                document.querySelector('.leaflet-container')?._leaflet_map
-              if (map) {
-                map
-                  .locate({
-                    setView: true,
-                    maxZoom: 13,
-                  })
-                  .on('locationerror', () => {
-                    // If location not found, center on first incident
-                    if (filteredAttacks.length > 0) {
-                      if (!filteredAttacks[0].coordinates) return
-                      const [lat, lng] = filteredAttacks[0].coordinates
-                        .split(',')
-                        .map(Number)
-                      map.setView([lat, lng], 13)
-                    }
-                  })
-                  .on('locationfound', (e: LocationEvent) => {
-                    map.setView(e.latlng, 13)
-                  })
-              }
-            }}
-            className="h-10 w-10 rounded-full shadow-lg hover:bg-accent"
-          >
-            <Locate className="h-4 w-4" />
-          </Button>
-        </div>
+          })
+        })}
+        <MapController
+          selectedId={selectedIncidentId}
+          incidents={filteredAttacks}
+        />
+        <LocationControl />
+      </MapContainer>
+    </div>
+  )
+}
+
+function LocationControl() {
+  const map = useMap()
+
+  const handleLocate = () => {
+    map.locate({ setView: true, maxZoom: 16 })
+
+    map.on('locationerror', () => {
+      console.error('Location access denied')
+    })
+
+    map.on('locationfound', (e: LocationEvent) => {
+      map.setView([e.latlng.lat, e.latlng.lng], 16)
+    })
+  }
+
+  return (
+    <div className="leaflet-bottom leaflet-left">
+      <div className="leaflet-control leaflet-bar">
+        <Button
+          variant="outline"
+          size="icon"
+          className="bg-background"
+          onClick={handleLocate}
+        >
+          <Locate className="h-4 w-4" />
+        </Button>
       </div>
-    </>
+    </div>
   )
 }

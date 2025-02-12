@@ -32,10 +32,13 @@ export default function Home() {
       setIsListExpanded(true)
       // Add a small delay to ensure the list is expanded before scrolling
       setTimeout(() => {
+        const container = document.querySelector('.overflow-y-auto')
         const element = document.getElementById(
           `incident-${selectedIncidentId}`
         )
-        if (element) {
+        if (element && container instanceof HTMLElement) {
+          // Set flag for programmatic scroll
+          container.dataset.programmaticScroll = 'true'
           element.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
       }, 300)
@@ -44,8 +47,8 @@ export default function Home() {
 
   const getTranslateY = () => {
     if (isListExpanded) return 'translate-y-0'
-    if (selectedIncidentId && !isListExpanded) return 'translate-y-[75%]'
-    return 'translate-y-[65%]'
+    if (selectedIncidentId && !isListExpanded) return 'translate-y-[60%]'
+    return 'translate-y-[45%]'
   }
 
   if (!mounted) {
@@ -70,7 +73,8 @@ export default function Home() {
           <div
             className={cn(
               'fixed inset-x-0 bottom-0 bg-background transition-all duration-300 ease-in-out',
-              'h-[85vh] overflow-hidden',
+              selectedIncidentId ? 'h-[70vh]' : 'h-[85vh]',
+              'overflow-hidden',
               getTranslateY()
             )}
             style={{ zIndex: 40 }}
@@ -90,15 +94,17 @@ export default function Home() {
               className="h-[calc(100%-24px)] overflow-y-auto px-1"
               onScroll={(e) => {
                 const target = e.currentTarget
-                if (target.scrollTop === 0) {
-                  setIsListExpanded(false)
-                }
-                if (target.scrollTop > 20) {
-                  setIsListExpanded(true)
-                  if (selectedIncidentId) {
-                    setSelectedIncidentId(null)
+                // Only handle scroll events for user-initiated scrolls
+                if (!target.dataset.programmaticScroll) {
+                  if (target.scrollTop === 0) {
+                    setIsListExpanded(false)
+                  }
+                  if (target.scrollTop > 20) {
+                    setIsListExpanded(true)
                   }
                 }
+                // Clear the flag after handling the event
+                delete target.dataset.programmaticScroll
               }}
             >
               <IncidentList />
