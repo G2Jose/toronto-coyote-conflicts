@@ -131,18 +131,7 @@ export function MapViewContent({
                     setSelectedIncidentId(incident.id)
                   },
                 }}
-              >
-                <Popup>
-                  <div className="flex flex-col gap-2">
-                    <p className="font-medium">{formatDate(incident.date)}</p>
-                    {totalIncidents > 1 && (
-                      <p className="text-sm text-muted-foreground">
-                        {totalIncidents} incidents at this location
-                      </p>
-                    )}
-                  </div>
-                </Popup>
-              </CircleMarker>
+              ></CircleMarker>
             )
           })
         })}
