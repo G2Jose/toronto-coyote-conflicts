@@ -129,6 +129,7 @@ export function MapViewContent({
                   .on('locationerror', () => {
                     // If location not found, center on first incident
                     if (filteredAttacks.length > 0) {
+                      if (!filteredAttacks[0].coordinates) return
                       const [lat, lng] = filteredAttacks[0].coordinates
                         .split(',')
                         .map(Number)
