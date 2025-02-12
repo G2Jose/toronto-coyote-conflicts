@@ -29,15 +29,20 @@ export const useAttackStore = create<AttackStore>((set) => ({
   setFilteredAttacks: (attacks) => set({ filteredAttacks: attacks }),
 }))
 
-const base = new Airtable({
-  apiKey: process.env.NEXT_PUBLIC_AIRTABLE_API_KEY,
-}).base(process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID!)
-
 export const fetchAttacks = async (): Promise<Incident[]> => {
+  const apiKey = process.env.NEXT_PUBLIC_AIRTABLE_API_KEY
+  const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID
+  const tableId = process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID
+
+  if (!apiKey || !baseId || !tableId) {
+    return []
+  }
+
+  const base = new Airtable({
+    apiKey,
+  }).base(baseId)
   try {
-    const records = await base(process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID!)
-      .select()
-      .all()
+    const records = await base(tableId).select().all()
     console.log(records)
 
     return records.map((record) => {
