@@ -130,7 +130,7 @@ export const fetchAttacks = async (): Promise<Incident[]> => {
         location: record.get('Location') as string,
         coordinates: record.get('Coordinates') as string | undefined,
         dogBreed: record.get('Dog breed') as string,
-        dogWeightLb: record.get('Dog weight (lbs)') as number,
+        dogWeightLb: record.get('Dog weight (lb)') as number,
         wasLeashed: record.get('Leashed') as string,
         numCoyotes: record.get('Number of coyotes') as number,
         notes: record.get('Notes') as string | undefined,

@@ -175,7 +175,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
           {incident.dogWeightLb && (
             <div>
               <span className="text-muted-foreground">Weight:</span>{' '}
-              {incident.dogWeightLb}lbs
+              {incident.dogWeightLb} lbs
             </div>
           )}
           {incident.wasLeashed && (
@@ -267,7 +267,7 @@ function IncidentCard({ incident }: { incident: Incident }) {
           {incident.dogWeightLb && (
             <div>
               <span className="text-muted-foreground">Weight:</span>{' '}
-              {incident.dogWeightLb}lbs
+              {incident.dogWeightLb} lbs
             </div>
           )}
           {incident.wasLeashed && (
@@ -310,13 +310,10 @@ function IncidentCard({ incident }: { incident: Incident }) {
 }
 
 export function IncidentList() {
-  const { filteredAttacks, selectedIncidentId } = useAttackStore()
+  const { filteredAttacks } = useAttackStore()
   const [searchQuery, setSearchQuery] = useState('')
 
   const searchFilteredIncidents = filteredAttacks.filter((incident) => {
-    // Always include the selected incident
-    if (incident.id === selectedIncidentId) return true
-
     if (!incident) return false
     const searchLower = searchQuery.toLowerCase()
     return (
@@ -325,16 +322,6 @@ export function IncidentList() {
       (incident.notes?.toLowerCase().includes(searchLower) ?? false)
     )
   })
-
-  // Ensure selected incident appears first in the list
-  const sortedIncidents = useMemo(() => {
-    if (!selectedIncidentId) return searchFilteredIncidents
-
-    return [
-      ...searchFilteredIncidents.filter((i) => i.id === selectedIncidentId),
-      ...searchFilteredIncidents.filter((i) => i.id !== selectedIncidentId),
-    ]
-  }, [searchFilteredIncidents, selectedIncidentId])
 
   return (
     <div className="p-3 lg:p-4">
@@ -348,12 +335,12 @@ export function IncidentList() {
       </div>
       <FilterBar />
       <div className="space-y-3 lg:space-y-4">
-        {sortedIncidents.length === 0 ? (
+        {searchFilteredIncidents.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
             No incidents found
           </div>
         ) : (
-          sortedIncidents.map((incident) => (
+          searchFilteredIncidents.map((incident) => (
             <IncidentCard key={incident.id} incident={incident} />
           ))
         )}
