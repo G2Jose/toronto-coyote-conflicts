@@ -3326,6 +3326,11 @@ react-resizable-panels@^2.1.7:
   resolved "https://registry.yarnpkg.com/react-resizable-panels/-/react-resizable-panels-2.1.7.tgz#afd29d8a3d708786a9f95183a38803c89f13c2e7"
   integrity sha512-JtT6gI+nURzhMYQYsx8DKkx6bSoOGFp7A3CwMrOb8y5jFHFyqwo9m68UhmXRw57fRVJksFn1TSlm3ywEQ9vMgA==
 
+react-scroll-into-view@^2.1.3:
+  version "2.1.3"
+  resolved "https://registry.yarnpkg.com/react-scroll-into-view/-/react-scroll-into-view-2.1.3.tgz#18d3fd5d86bdca157fcb83d68bcbb4f656840727"
+  integrity sha512-8RQSkOQELwV4E3AtRwbOGn5SkTkt7+63TZ51RJzvcuSUVNMAE+RzMikf1DGyAL2o6LnRHg/1Eg4cJJMdId6kHA==
+
 react-smooth@^4.0.0:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/react-smooth/-/react-smooth-4.0.4.tgz#a5875f8bb61963ca61b819cedc569dc2453894b4"

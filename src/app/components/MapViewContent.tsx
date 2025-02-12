@@ -1,19 +1,12 @@
 'use client'
 
-import {
-  MapContainer,
-  TileLayer,
-  Popup,
-  useMap,
-  CircleMarker,
-} from 'react-leaflet'
+import { MapContainer, TileLayer, useMap, CircleMarker } from 'react-leaflet'
 import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/attackStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { formatDate } from '@/app/utils'
 import { useAttackStore } from '../store/attackStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
 
@@ -56,7 +49,7 @@ function MapController({
     if (!incident?.coordinates) return
 
     const [lat, lng] = incident.coordinates.split(',').map(Number)
-    map.setView([lat, lng], 16)
+    map.setView([lat, lng], 18)
   }, [selectedId, incidents, map])
 
   return null
@@ -118,7 +111,7 @@ export function MapViewContent({
               <CircleMarker
                 key={incident.id}
                 center={[lat + offsetY, lng + offsetX]}
-                radius={8}
+                radius={4}
                 pathOptions={{
                   fillColor:
                     selectedIncidentId === incident.id ? 'blue' : 'red',
@@ -131,18 +124,7 @@ export function MapViewContent({
                     setSelectedIncidentId(incident.id)
                   },
                 }}
-              >
-                <Popup>
-                  <div className="flex flex-col gap-2">
-                    <p className="font-medium">{formatDate(incident.date)}</p>
-                    {totalIncidents > 1 && (
-                      <p className="text-sm text-muted-foreground">
-                        {totalIncidents} incidents at this location
-                      </p>
-                    )}
-                  </div>
-                </Popup>
-              </CircleMarker>
+              ></CircleMarker>
             )
           })
         })}

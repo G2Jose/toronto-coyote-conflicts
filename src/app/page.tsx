@@ -55,26 +55,8 @@ export default function Home() {
   useEffect(() => {
     if (selectedIncidentId) {
       setIsListExpanded(true)
-      // Add a small delay to ensure the list is expanded before scrolling
-      setTimeout(() => {
-        const container = document.querySelector('.overflow-y-auto')
-        const element = document.getElementById(
-          `incident-${selectedIncidentId}`
-        )
-        if (element && container instanceof HTMLElement) {
-          // Set flag for programmatic scroll
-          container.dataset.programmaticScroll = 'true'
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }
-      }, 300)
     }
   }, [selectedIncidentId])
-
-  const getTranslateY = () => {
-    if (isListExpanded) return 'translate-y-0'
-    if (selectedIncidentId && !isListExpanded) return 'translate-y-[60%]'
-    return 'translate-y-[45%]'
-  }
 
   if (!mounted) {
     return null
@@ -92,19 +74,21 @@ export default function Home() {
       <main className="max-w-[2000px] mx-auto h-[calc(100vh-88px)]">
         {/* Mobile Layout (map with expanding list) */}
         <div className="block lg:hidden h-full relative">
-          <div className="h-full">
+          <div
+            className={cn(
+              'absolute inset-x-0 top-0 w-full transition-[height] duration-300',
+              isListExpanded ? 'h-[45vh]' : 'h-full'
+            )}
+          >
             <MapView />
           </div>
           <div
             className={cn(
-              'fixed inset-x-0 bottom-0 bg-background transition-all duration-300 ease-in-out',
-              selectedIncidentId ? 'h-[70vh]' : 'h-[85vh]',
-              'overflow-hidden',
-              getTranslateY()
+              'absolute inset-x-0 bottom-0 bg-background transition-[height] duration-300',
+              isListExpanded ? 'h-[60vh]' : 'h-[35vh]'
             )}
-            style={{ zIndex: 1001 }}
           >
-            <div className="sticky top-0 inset-x-0 bg-background pt-2 pb-1 rounded-t-xl border-t">
+            <div className="sticky top-0 bg-background pt-2 pb-1 rounded-t-xl border-t">
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => {
@@ -123,23 +107,7 @@ export default function Home() {
                 </button>
               </div>
             </div>
-            <div
-              className="h-[calc(100%-24px)] overflow-y-auto px-1"
-              onScroll={(e) => {
-                const target = e.currentTarget
-                // Only handle scroll events for user-initiated scrolls
-                if (!target.dataset.programmaticScroll) {
-                  if (target.scrollTop === 0) {
-                    setIsListExpanded(false)
-                  }
-                  if (target.scrollTop > 20) {
-                    setIsListExpanded(true)
-                  }
-                }
-                // Clear the flag after handling the event
-                delete target.dataset.programmaticScroll
-              }}
-            >
+            <div className="h-[calc(100%-40px)] overflow-y-auto incident-list-container px-1">
               <IncidentList />
             </div>
           </div>
@@ -147,7 +115,7 @@ export default function Home() {
 
         {/* Desktop Layout (side by side) */}
         <div className="hidden lg:grid lg:grid-cols-2 h-full">
-          <div className="overflow-y-auto border-r">
+          <div className="overflow-y-auto incident-list-container border-r">
             <IncidentList />
           </div>
           <div className="h-full">
