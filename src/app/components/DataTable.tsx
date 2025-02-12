@@ -31,7 +31,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAttackStore, type Incident } from '../store/attackStore'
-import dayjs from 'dayjs'
 import {
   ArrowUpIcon,
   ArrowDownIcon,
@@ -41,6 +40,8 @@ import {
 } from 'lucide-react'
 import { LocationCell } from './LocationCell'
 import React from 'react'
+import { formatDate } from '@/app/utils'
+import dayjs from 'dayjs'
 
 interface SortableHeaderProps<TData> {
   column: Column<TData, unknown>
@@ -91,9 +92,20 @@ const columns: ColumnDef<Incident>[] = [
     header: ({ column }) => (
       <SortableHeader<Incident> column={column} title="Date" />
     ),
-    cell: ({ row }) => (
-      <div>{dayjs(row.getValue<string>('date')).format('MMM DD YYYY')}</div>
-    ),
+    cell: ({ row }) => <div>{formatDate(row.getValue<string>('date'))}</div>,
+    sortingFn: (rowA, rowB) => {
+      const a = rowA.getValue<string>('date')
+      const b = rowB.getValue<string>('date')
+
+      console.log({ a, b })
+
+      if (!a || !b) {
+        console.log('returning 0')
+        return 0
+      }
+
+      return dayjs(a).valueOf() - dayjs(b).valueOf()
+    },
   },
   {
     accessorKey: 'time',
@@ -114,9 +126,14 @@ const columns: ColumnDef<Incident>[] = [
     header: ({ column }) => (
       <SortableHeader<Incident> column={column} title="Leashed" />
     ),
-    cell: ({ row }) => (
-      <div>{row.getValue<boolean>('wasLeashed') ? 'Yes' : 'No'}</div>
+    cell: ({ row }) => <div>{row.getValue<string>('wasLeashed')}</div>,
+  },
+  {
+    accessorKey: 'dogInjured',
+    header: ({ column }) => (
+      <SortableHeader<Incident> column={column} title="Dog Injured" />
     ),
+    cell: ({ row }) => <div>{row.getValue<string>('dogInjured')}</div>,
   },
   {
     accessorKey: 'dogWeightLb',
@@ -178,11 +195,12 @@ function ExpandedRow({ incident }: { incident: Incident }) {
         </div>
         <div className="col-span-2 flex flex-col">
           <h4 className="font-semibold mb-2">Location</h4>
-          <LocationCell
-            lat={incident.lat}
-            lng={incident.lng}
-            incident={incident}
-          />
+          {incident.coordinates && (
+            <LocationCell
+              coordinates={incident.coordinates}
+              incident={incident}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -191,12 +209,16 @@ function ExpandedRow({ incident }: { incident: Incident }) {
 
 export function DataTable() {
   const { filteredAttacks } = useAttackStore()
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: 'date',
+      desc: true,
+    },
+  ])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     lat: false,
     lng: false,
-    notes: false,
   })
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -216,6 +238,21 @@ export function DataTable() {
       columnFilters,
       columnVisibility,
       globalFilter,
+    },
+    initialState: {
+      pagination: {
+        pageSize: 99999,
+      },
+      sorting: [
+        {
+          id: 'date',
+          desc: true,
+        },
+      ],
+      columnVisibility: {
+        lat: false,
+        lng: false,
+      },
     },
     enableSorting: true,
     enableColumnFilters: true,

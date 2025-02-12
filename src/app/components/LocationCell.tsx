@@ -10,13 +10,13 @@ const Map = dynamic(() => import('./Map').then((mod) => mod.Map), {
 })
 
 interface LocationCellProps {
-  lat: number
-  lng: number
+  coordinates: string
   incident: Incident
 }
 
-export function LocationCell({ lat, lng, incident }: LocationCellProps) {
+export function LocationCell({ coordinates, incident }: LocationCellProps) {
   const [mounted, setMounted] = useState(false)
+  const [lat, lng] = coordinates.split(',').map(Number)
 
   useEffect(() => {
     setMounted(true)
@@ -41,8 +41,7 @@ export function LocationCell({ lat, lng, incident }: LocationCellProps) {
       <Map
         mapOptions={mapOptions}
         style={{ height: '100%', width: '100%' }}
-        lat={lat}
-        lng={lng}
+        coordinates={coordinates}
         incident={incident}
       />
     </div>

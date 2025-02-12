@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { formatDate } from '@/app/utils'
 
 function IncidentDetails({ incident }: { incident: Incident }) {
   return (
@@ -21,7 +22,7 @@ function IncidentDetails({ incident }: { incident: Incident }) {
             <p>Time: {incident.time}</p>
             <p>Dog Breed: {incident.dogBreed}</p>
             <p>Dog Weight: {incident.dogWeightLb} lbs</p>
-            <p>Was Leashed: {incident.wasLeashed ? 'Yes' : 'No'}</p>
+            <p>Was Leashed: {incident.wasLeashed}</p>
             <p>Coyotes Involved: {incident.numCoyotes}</p>
           </div>
         </div>
@@ -39,13 +40,13 @@ function IncidentDetails({ incident }: { incident: Incident }) {
 interface MapProps {
   mapOptions: MapOptions
   style: { height: string; width: string }
-  lat: number
-  lng: number
+  coordinates: string
   incident: Incident
 }
 
-export function Map({ mapOptions, style, lat, lng, incident }: MapProps) {
+export function Map({ mapOptions, style, coordinates, incident }: MapProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [lat, lng] = coordinates.split(',').map(Number)
 
   return (
     <>
@@ -60,9 +61,7 @@ export function Map({ mapOptions, style, lat, lng, incident }: MapProps) {
           >
             <Popup>
               <div className="text-sm text-center">
-                <p className="font-medium">
-                  {dayjs(incident.date).format('MMM DD')}
-                </p>
+                <p className="font-medium">{formatDate(incident.date)}</p>
                 <p>{incident.time}</p>
               </div>
             </Popup>

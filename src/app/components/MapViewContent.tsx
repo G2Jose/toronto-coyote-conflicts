@@ -9,6 +9,7 @@ import { Drawer } from 'vaul'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
+import { formatDate } from '@/app/utils'
 
 declare global {
   interface Window {
@@ -44,11 +45,11 @@ function IncidentDetails({ incident }: { incident: Incident }) {
         <div>
           <h3 className="font-semibold mb-2">Incident Details</h3>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            <p>Date: {dayjs(incident.date).format('MMM DD YYYY')}</p>
+            <p>Date: {formatDate(incident.date)}</p>
             <p>Time: {incident.time}</p>
             <p>Dog Breed: {incident.dogBreed}</p>
             <p>Dog Weight: {incident.dogWeightLb} lbs</p>
-            <p>Was Leashed: {incident.wasLeashed ? 'Yes' : 'No'}</p>
+            <p>Was Leashed: {incident.wasLeashed}</p>
             <p>Coyotes Involved: {incident.numCoyotes}</p>
           </div>
         </div>
@@ -90,24 +91,28 @@ export function MapViewContent({
           className="z-0"
         >
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          {filteredAttacks.map((attack) => (
-            <Marker
-              key={attack.id}
-              position={[attack.lat, attack.lng]}
-              eventHandlers={{
-                click: () => setSelectedIncident(attack),
-              }}
-            >
-              <Popup>
-                <div className="text-sm text-center">
-                  <p className="font-medium">
-                    {dayjs(attack.date).format('MMM DD')}
-                  </p>
-                  <p>{attack.time}</p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {filteredAttacks.map((attack) => {
+            if (!attack.coordinates) return null
+            const [lat, lng] = attack.coordinates.split(',').map(Number) ?? [
+              0, 0,
+            ]
+            return (
+              <Marker
+                key={attack.id}
+                position={[lat, lng]}
+                eventHandlers={{
+                  click: () => setSelectedIncident(attack),
+                }}
+              >
+                <Popup>
+                  <div className="text-sm text-center">
+                    <p className="font-medium">{formatDate(attack.date)}</p>
+                    <p>{attack.time}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          })}
         </MapContainer>
         <div className="absolute bottom-4 right-4 z-[400]">
           <Button
@@ -125,8 +130,10 @@ export function MapViewContent({
                   .on('locationerror', () => {
                     // If location not found, center on first incident
                     if (filteredAttacks.length > 0) {
-                      const firstIncident = filteredAttacks[0]
-                      map.setView([firstIncident.lat, firstIncident.lng], 13)
+                      const [lat, lng] = filteredAttacks[0].coordinates
+                        .split(',')
+                        .map(Number)
+                      map.setView([lat, lng], 13)
                     }
                   })
                   .on('locationfound', (e: LocationEvent) => {
