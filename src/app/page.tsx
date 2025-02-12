@@ -5,6 +5,7 @@ import { MapView } from './components/MapView'
 import { IncidentList } from './components/IncidentList'
 import { useAttackStore, fetchAttacks } from './store/attackStore'
 import { cn } from '@/lib/utils'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 export default function Home() {
   const {
@@ -80,15 +81,23 @@ export default function Home() {
             style={{ zIndex: 1001 }}
           >
             <div className="sticky top-0 inset-x-0 bg-background pt-2 pb-1 rounded-t-xl border-t">
-              <div
-                className="w-12 h-1.5 bg-muted-foreground/20 rounded-full mx-auto cursor-grab active:cursor-grabbing"
-                onPointerDown={() => {
-                  setIsListExpanded(!isListExpanded)
-                  if (selectedIncidentId && !isListExpanded) {
-                    setSelectedIncidentId(null)
-                  }
-                }}
-              />
+              <div className="flex items-center justify-center">
+                <button
+                  onClick={() => {
+                    setIsListExpanded(!isListExpanded)
+                    if (selectedIncidentId && !isListExpanded) {
+                      setSelectedIncidentId(null)
+                    }
+                  }}
+                  className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-accent"
+                >
+                  {isListExpanded ? (
+                    <ChevronDown className="h-5 w-5" />
+                  ) : (
+                    <ChevronUp className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </div>
             <div
               className="h-[calc(100%-24px)] overflow-y-auto px-1"
