@@ -1,7 +1,7 @@
 'use client'
 
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
-import type { Incident } from '../store/attackStore'
+import type { Incident } from '../store/incidentStore'
 import type { MapOptions } from 'leaflet'
 import { Drawer } from 'vaul'
 import { Button } from '@/components/ui/button'

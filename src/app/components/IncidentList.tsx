@@ -1,10 +1,10 @@
 'use client'
 
-import { useAttackStore } from '../store/attackStore'
+import { incidentStore } from '../store/incidentStore'
 import { formatDate } from '@/app/utils'
 import { Input } from '@/components/ui/input'
 import { useState, useMemo } from 'react'
-import type { Incident, SortField } from '../store/attackStore'
+import type { Incident, SortField } from '../store/incidentStore'
 import {
   Select,
   SelectContent,
@@ -13,18 +13,17 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-import ScrollIntoView from 'react-scroll-into-view'
 
 function FilterBar() {
   const {
-    attacks,
+    incidents: attacks,
     sortField,
     setSortField,
     sortOrder,
     setSortOrder,
     filters,
     setFilters,
-  } = useAttackStore()
+  } = incidentStore()
 
   const uniqueDogBreeds = useMemo(() => {
     const breeds = new Set(attacks.map((i) => i.dogBreed).filter(Boolean))
@@ -126,191 +125,95 @@ function FilterBar() {
 }
 
 function IncidentCard({ incident }: { incident: Incident }) {
-  const { selectedIncidentId, setSelectedIncidentId } = useAttackStore()
+  const { selectedIncidentId, setSelectedIncidentId } = incidentStore()
   const isSelected = selectedIncidentId === incident.id
 
-  // Handle click
-  const handleClick = () => {
-    const wasSelected = selectedIncidentId === incident.id
-    setSelectedIncidentId(wasSelected ? null : incident.id)
-  }
-
-  if (!isSelected) {
-    return (
-      <div
-        id={`incident-${incident.id}`}
-        className={cn(
-          'border rounded-lg p-3 lg:p-4 transition-all cursor-pointer scroll-mt-4',
-          'hover:border-primary/50 hover:bg-muted/50'
-        )}
-        onClick={handleClick}
-      >
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            {incident.location && (
-              <h3 className="font-semibold text-sm lg:text-base">
-                {incident.location}
-              </h3>
-            )}
-            {(incident.date || incident.time) && (
-              <p className="text-xs lg:text-sm text-muted-foreground">
-                {incident.date && formatDate(incident.date)}
-                {incident.date && incident.time && ' at '}
-                {incident.time}
-              </p>
-            )}
-          </div>
-        </div>
-        <div
-          className={`grid gap-1 lg:gap-2 text-xs lg:text-sm mb-2 lg:mb-3 ${
-            isSelected ? 'grid-cols-1' : 'grid-cols-2'
-          }`}
-        >
-          {incident.dogBreed && (
-            <div>
-              <span className="text-muted-foreground">Dog Breed:</span>{' '}
-              {incident.dogBreed}
-            </div>
-          )}
-          {incident.dogWeightLb && (
-            <div>
-              <span className="text-muted-foreground">Weight:</span>{' '}
-              {incident.dogWeightLb} lbs
-            </div>
-          )}
-          {incident.wasLeashed && (
-            <div>
-              <span className="text-muted-foreground">Leashed:</span>{' '}
-              {incident.wasLeashed}
-            </div>
-          )}
-          {incident.numCoyotes && (
-            <div>
-              <span className="text-muted-foreground">Coyotes:</span>{' '}
-              {incident.numCoyotes}
-            </div>
-          )}
-          {incident.dogInjured && (
-            <div>
-              <span className="text-muted-foreground">Dog Injured:</span>{' '}
-              {incident.dogInjured}
-            </div>
-          )}
-        </div>
-        {incident.notes && (
-          <div
-            className={`text-xs lg:text-sm text-muted-foreground ${
-              isSelected ? '' : 'line-clamp-2'
-            }`}
-          >
-            {incident.notes}
-          </div>
-        )}
-        {isSelected && incident.coordinates && (
-          <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
-            <span className="text-muted-foreground">Location:</span>{' '}
-            {incident.coordinates}
-          </div>
-        )}
-      </div>
-    )
-  }
-
   return (
-    <ScrollIntoView
-      alignToTop
-      smooth
-      selector={`#incident-${incident.id}`}
-      scrollOptions={{
-        block: 'start',
-        behavior: 'smooth',
-        inline: 'nearest',
-      }}
-    >
-      <div
-        id={`incident-${incident.id}`}
-        className={cn(
-          'border rounded-lg p-3 lg:p-4 transition-all cursor-pointer scroll-mt-4',
-          'hover:border-primary/50 hover:bg-muted/50',
+    <div
+      id={`incident-${incident.id}`}
+      className={cn(
+        'border rounded-lg p-3 lg:p-4 transition-all cursor-pointer',
+        'hover:border-primary/50 hover:bg-muted/50',
+        isSelected && [
           'border-2 border-white bg-muted',
-          'shadow-[0_0_0_1px] shadow-primary'
-        )}
-        onClick={handleClick}
+          'shadow-[0_0_0_1px] shadow-primary',
+        ]
+      )}
+      onClick={() => setSelectedIncidentId(isSelected ? null : incident.id)}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div>
+          {incident.location && (
+            <h3 className="font-semibold text-sm lg:text-base">
+              {incident.location}
+            </h3>
+          )}
+          {(incident.date || incident.time) && (
+            <p className="text-xs lg:text-sm text-muted-foreground">
+              {incident.date && formatDate(incident.date)}
+              {incident.date && incident.time && ' at '}
+              {incident.time}
+            </p>
+          )}
+        </div>
+      </div>
+      <div
+        className={`grid gap-1 lg:gap-2 text-xs lg:text-sm mb-2 lg:mb-3 ${
+          isSelected ? 'grid-cols-1' : 'grid-cols-2'
+        }`}
       >
-        <div className="flex justify-between items-start mb-2">
+        {incident.dogBreed && (
           <div>
-            {incident.location && (
-              <h3 className="font-semibold text-sm lg:text-base">
-                {incident.location}
-              </h3>
-            )}
-            {(incident.date || incident.time) && (
-              <p className="text-xs lg:text-sm text-muted-foreground">
-                {incident.date && formatDate(incident.date)}
-                {incident.date && incident.time && ' at '}
-                {incident.time}
-              </p>
-            )}
-          </div>
-        </div>
-        <div
-          className={`grid gap-1 lg:gap-2 text-xs lg:text-sm mb-2 lg:mb-3 ${
-            isSelected ? 'grid-cols-1' : 'grid-cols-2'
-          }`}
-        >
-          {incident.dogBreed && (
-            <div>
-              <span className="text-muted-foreground">Dog Breed:</span>{' '}
-              {incident.dogBreed}
-            </div>
-          )}
-          {incident.dogWeightLb && (
-            <div>
-              <span className="text-muted-foreground">Weight:</span>{' '}
-              {incident.dogWeightLb} lbs
-            </div>
-          )}
-          {incident.wasLeashed && (
-            <div>
-              <span className="text-muted-foreground">Leashed:</span>{' '}
-              {incident.wasLeashed}
-            </div>
-          )}
-          {incident.numCoyotes && (
-            <div>
-              <span className="text-muted-foreground">Coyotes:</span>{' '}
-              {incident.numCoyotes}
-            </div>
-          )}
-          {incident.dogInjured && (
-            <div>
-              <span className="text-muted-foreground">Dog Injured:</span>{' '}
-              {incident.dogInjured}
-            </div>
-          )}
-        </div>
-        {incident.notes && (
-          <div
-            className={`text-xs lg:text-sm text-muted-foreground ${
-              isSelected ? '' : 'line-clamp-2'
-            }`}
-          >
-            {incident.notes}
+            <span className="text-muted-foreground">Dog Breed:</span>{' '}
+            {incident.dogBreed}
           </div>
         )}
-        {isSelected && incident.coordinates && (
-          <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
-            <span className="text-muted-foreground">Location:</span>{' '}
-            {incident.coordinates}
+        {incident.dogWeightLb && (
+          <div>
+            <span className="text-muted-foreground">Weight:</span>{' '}
+            {incident.dogWeightLb}lbs
+          </div>
+        )}
+        {incident.wasLeashed && (
+          <div>
+            <span className="text-muted-foreground">Leashed:</span>{' '}
+            {incident.wasLeashed}
+          </div>
+        )}
+        {incident.numCoyotes && (
+          <div>
+            <span className="text-muted-foreground">Coyotes:</span>{' '}
+            {incident.numCoyotes}
+          </div>
+        )}
+        {incident.dogInjured && (
+          <div>
+            <span className="text-muted-foreground">Dog Injured:</span>{' '}
+            {incident.dogInjured}
           </div>
         )}
       </div>
-    </ScrollIntoView>
+      {incident.notes && (
+        <div
+          className={`text-xs lg:text-sm text-muted-foreground ${
+            isSelected ? '' : 'line-clamp-2'
+          }`}
+        >
+          {incident.notes}
+        </div>
+      )}
+      {isSelected && incident.coordinates && (
+        <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
+          <span className="text-muted-foreground">Location:</span>{' '}
+          {incident.coordinates}
+        </div>
+      )}
+    </div>
   )
 }
 
 export function IncidentList() {
-  const { filteredAttacks } = useAttackStore()
+  const { filteredAttacks } = incidentStore()
   const [searchQuery, setSearchQuery] = useState('')
 
   const searchFilteredIncidents = filteredAttacks.filter((incident) => {

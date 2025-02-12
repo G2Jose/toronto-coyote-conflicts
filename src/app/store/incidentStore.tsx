@@ -24,8 +24,8 @@ type Filters = {
 }
 
 type AttackStore = {
-  attacks: Incident[]
-  setAttacks: (attacks: Incident[]) => void
+  incidents: Incident[]
+  setIncidents: (attacks: Incident[]) => void
   filteredAttacks: Incident[]
   setFilteredAttacks: (attacks: Incident[]) => void
   selectedIncidentId: string | null
@@ -39,10 +39,10 @@ type AttackStore = {
   applyFiltersAndSort: () => void
 }
 
-export const useAttackStore = create<AttackStore>((set, get) => ({
-  attacks: [],
-  setAttacks: (attacks) => {
-    set({ attacks })
+export const incidentStore = create<AttackStore>((set, get) => ({
+  incidents: [],
+  setIncidents: (attacks) => {
+    set({ incidents: attacks })
     get().applyFiltersAndSort()
   },
   filteredAttacks: [],
@@ -65,7 +65,7 @@ export const useAttackStore = create<AttackStore>((set, get) => ({
     get().applyFiltersAndSort()
   },
   applyFiltersAndSort: () => {
-    const { attacks, sortField, sortOrder, filters } = get()
+    const { incidents: attacks, sortField, sortOrder, filters } = get()
 
     let result = [...attacks]
 
@@ -130,7 +130,7 @@ export const fetchAttacks = async (): Promise<Incident[]> => {
         location: record.get('Location') as string,
         coordinates: record.get('Coordinates') as string | undefined,
         dogBreed: record.get('Dog breed') as string,
-        dogWeightLb: record.get('Dog weight (lb)') as number,
+        dogWeightLb: record.get('Dog weight (lbs)') as number,
         wasLeashed: record.get('Leashed') as string,
         numCoyotes: record.get('Number of coyotes') as number,
         notes: record.get('Notes') as string | undefined,

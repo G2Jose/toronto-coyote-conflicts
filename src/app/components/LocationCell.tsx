@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import type { Incident } from '../store/attackStore'
+import type { Incident } from '../store/incidentStore'
 import type { MapOptions } from 'leaflet'
 
 const Map = dynamic(() => import('./Map').then((mod) => mod.Map), {

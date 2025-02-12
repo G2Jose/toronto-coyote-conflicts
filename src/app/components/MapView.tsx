@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import type { MapOptions } from 'leaflet'
-import { useAttackStore } from '../store/attackStore'
+import { incidentStore } from '../store/incidentStore'
 
 const MapWithNoSSR = dynamic(
   () => import('./MapViewContent').then((mod) => mod.MapViewContent),
@@ -11,7 +11,7 @@ const MapWithNoSSR = dynamic(
 )
 
 export function MapView() {
-  const { filteredAttacks } = useAttackStore()
+  const { filteredAttacks } = incidentStore()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {

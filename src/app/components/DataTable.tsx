@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useAttackStore, type Incident } from '../store/attackStore'
+import { incidentStore, type Incident } from '../store/incidentStore'
 import {
   ArrowUpIcon,
   ArrowDownIcon,
@@ -208,7 +208,7 @@ function ExpandedRow({ incident }: { incident: Incident }) {
 }
 
 export function DataTable() {
-  const { filteredAttacks } = useAttackStore()
+  const { filteredAttacks } = incidentStore()
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: 'date',

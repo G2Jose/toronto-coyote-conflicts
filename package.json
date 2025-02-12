@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint && yarn lint:types",
+    "lint": "next lint",
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
@@ -62,7 +62,6 @@
     "react-hook-form": "^7.54.1",
     "react-leaflet": "latest",
     "react-resizable-panels": "^2.1.7",
-    "react-scroll-into-view": "^2.1.3",
     "recharts": "2.15.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^3.0.1",

@@ -1,13 +1,20 @@
 'use client'
 
-import { MapContainer, TileLayer, useMap, CircleMarker } from 'react-leaflet'
+import {
+  MapContainer,
+  TileLayer,
+  Popup,
+  useMap,
+  CircleMarker,
+} from 'react-leaflet'
 import type { MapOptions } from 'leaflet'
-import type { Incident } from '../store/attackStore'
+import type { Incident } from '../store/incidentStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { useAttackStore } from '../store/attackStore'
+import { formatDate } from '@/app/utils'
+import { incidentStore } from '../store/incidentStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
 
 declare global {
@@ -49,7 +56,7 @@ function MapController({
     if (!incident?.coordinates) return
 
     const [lat, lng] = incident.coordinates.split(',').map(Number)
-    map.setView([lat, lng], 18)
+    map.setView([lat, lng], 16)
   }, [selectedId, incidents, map])
 
   return null
@@ -64,7 +71,7 @@ export function MapViewContent({
   mapOptions,
   filteredAttacks,
 }: MapViewContentProps) {
-  const { selectedIncidentId, setSelectedIncidentId } = useAttackStore()
+  const { selectedIncidentId, setSelectedIncidentId } = incidentStore()
 
   // Group incidents by coordinates to handle overlapping markers
   const markerGroups = useMemo(() => {
@@ -111,7 +118,7 @@ export function MapViewContent({
               <CircleMarker
                 key={incident.id}
                 center={[lat + offsetY, lng + offsetX]}
-                radius={4}
+                radius={8}
                 pathOptions={{
                   fillColor:
                     selectedIncidentId === incident.id ? 'blue' : 'red',
@@ -124,7 +131,18 @@ export function MapViewContent({
                     setSelectedIncidentId(incident.id)
                   },
                 }}
-              ></CircleMarker>
+              >
+                <Popup>
+                  <div className="flex flex-col gap-2">
+                    <p className="font-medium">{formatDate(incident.date)}</p>
+                    {totalIncidents > 1 && (
+                      <p className="text-sm text-muted-foreground">
+                        {totalIncidents} incidents at this location
+                      </p>
+                    )}
+                  </div>
+                </Popup>
+              </CircleMarker>
             )
           })
         })}
