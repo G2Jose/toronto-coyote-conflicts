@@ -77,7 +77,7 @@ export default function Home() {
               'overflow-hidden',
               getTranslateY()
             )}
-            style={{ zIndex: 40 }}
+            style={{ zIndex: 1001 }}
           >
             <div className="sticky top-0 inset-x-0 bg-background pt-2 pb-1 rounded-t-xl border-t">
               <div
