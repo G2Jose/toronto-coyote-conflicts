@@ -28,7 +28,7 @@ export function MapView() {
   }
 
   return (
-    <div className="h-[calc(100vh-120px)] w-full rounded-lg overflow-hidden shadow-lg">
+    <div className="h-full w-full">
       <MapWithNoSSR mapOptions={mapOptions} filteredAttacks={filteredAttacks} />
     </div>
   )

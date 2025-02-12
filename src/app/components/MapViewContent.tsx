@@ -1,14 +1,15 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/attackStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
 import { Drawer } from 'vaul'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { formatDate } from '@/app/utils'
+import { useAttackStore } from '../store/attackStore'
 
 declare global {
   interface Window {
@@ -63,6 +64,29 @@ function IncidentDetails({ incident }: { incident: Incident }) {
   )
 }
 
+// Component to handle map updates
+function MapController({
+  selectedId,
+  incidents,
+}: {
+  selectedId: string | null
+  incidents: Incident[]
+}) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!selectedId) return
+
+    const incident = incidents.find((a) => a.id === selectedId)
+    if (!incident?.coordinates) return
+
+    const [lat, lng] = incident.coordinates.split(',').map(Number)
+    map.setView([lat, lng], 16)
+  }, [selectedId, incidents, map])
+
+  return null
+}
+
 interface MapViewContentProps {
   mapOptions: MapOptions
   filteredAttacks: Incident[]
@@ -75,6 +99,12 @@ export function MapViewContent({
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(
     null
   )
+  const { selectedIncidentId, setSelectedIncidentId } = useAttackStore()
+
+  // Store map reference when mounted
+  const handleMapMount = (map: LeafletMap) => {
+    // Implementation of handleMapMount
+  }
 
   // Store filteredAttacks in window for LocationControl to access
   if (typeof window !== 'undefined') {
@@ -89,19 +119,27 @@ export function MapViewContent({
           style={{ height: '100%', width: '100%' }}
           className="z-0"
         >
+          <MapController
+            selectedId={selectedIncidentId}
+            incidents={filteredAttacks}
+          />
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
           {filteredAttacks.map((attack) => {
             if (!attack.coordinates) return null
-            const [lat, lng] = attack.coordinates.split(',').map(Number) ?? [
-              0, 0,
-            ]
+            const [lat, lng] = attack.coordinates.split(',').map(Number)
+            const isSelected = attack.id === selectedIncidentId
+
             return (
               <Marker
                 key={attack.id}
                 position={[lat, lng]}
                 eventHandlers={{
-                  click: () => setSelectedIncident(attack),
+                  click: () => {
+                    setSelectedIncidentId(attack.id)
+                    setSelectedIncident(attack)
+                  },
                 }}
+                opacity={isSelected ? 1 : 0.6}
               >
                 <Popup>
                   <div className="text-sm text-center">

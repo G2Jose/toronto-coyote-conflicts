@@ -15,18 +15,95 @@ export interface Incident {
   dogInjured: string
 }
 
+export type SortField = 'date' | 'dogBreed' | 'dogWeightLb' | 'numCoyotes'
+type SortOrder = 'asc' | 'desc'
+type Filters = {
+  dogBreed?: string
+  wasLeashed?: string
+  dogInjured?: string
+}
+
 type AttackStore = {
   attacks: Incident[]
   setAttacks: (attacks: Incident[]) => void
   filteredAttacks: Incident[]
   setFilteredAttacks: (attacks: Incident[]) => void
+  selectedIncidentId: string | null
+  setSelectedIncidentId: (id: string | null) => void
+  sortField: SortField
+  setSortField: (field: SortField) => void
+  sortOrder: SortOrder
+  setSortOrder: (order: SortOrder) => void
+  filters: Filters
+  setFilters: (filters: Filters) => void
+  applyFiltersAndSort: () => void
 }
 
-export const useAttackStore = create<AttackStore>((set) => ({
+export const useAttackStore = create<AttackStore>((set, get) => ({
   attacks: [],
-  setAttacks: (attacks) => set({ attacks }),
+  setAttacks: (attacks) => {
+    set({ attacks })
+    get().applyFiltersAndSort()
+  },
   filteredAttacks: [],
   setFilteredAttacks: (attacks) => set({ filteredAttacks: attacks }),
+  selectedIncidentId: null,
+  setSelectedIncidentId: (id) => set({ selectedIncidentId: id }),
+  sortField: 'date',
+  setSortField: (field) => {
+    set({ sortField: field })
+    get().applyFiltersAndSort()
+  },
+  sortOrder: 'desc',
+  setSortOrder: (order) => {
+    set({ sortOrder: order })
+    get().applyFiltersAndSort()
+  },
+  filters: {},
+  setFilters: (filters) => {
+    set({ filters })
+    get().applyFiltersAndSort()
+  },
+  applyFiltersAndSort: () => {
+    const { attacks, sortField, sortOrder, filters } = get()
+
+    let result = [...attacks]
+
+    // Apply filters
+    if (filters.dogBreed) {
+      result = result.filter((i) =>
+        i.dogBreed?.toLowerCase().includes(filters.dogBreed!.toLowerCase())
+      )
+    }
+    if (filters.wasLeashed) {
+      result = result.filter((i) => i.wasLeashed === filters.wasLeashed)
+    }
+    if (filters.dogInjured) {
+      result = result.filter((i) => i.dogInjured === filters.dogInjured)
+    }
+
+    // Apply sorting
+    result.sort((a, b) => {
+      const aVal = a[sortField]
+      const bVal = b[sortField]
+
+      if (!aVal && !bVal) return 0
+      if (!aVal) return 1
+      if (!bVal) return -1
+
+      if (sortField === 'date') {
+        return sortOrder === 'desc'
+          ? new Date(bVal).getTime() - new Date(aVal).getTime()
+          : new Date(aVal).getTime() - new Date(bVal).getTime()
+      }
+
+      return sortOrder === 'desc'
+        ? String(bVal).localeCompare(String(aVal))
+        : String(aVal).localeCompare(String(bVal))
+    })
+
+    set({ filteredAttacks: result })
+  },
 }))
 
 export const fetchAttacks = async (): Promise<Incident[]> => {

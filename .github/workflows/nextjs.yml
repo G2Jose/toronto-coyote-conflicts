@@ -74,13 +74,6 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
-
-      - name: 'check is MY_SECRET exists'
-        env:
-          super_secret: ${{ secrets.NEXT_PUBLIC_AIRTABLE_API_KEY }}
-        if: ${{ env.super_secret == '' }}
-        run: 'echo "echo the secret \"NEXT_PUBLIC_AIRTABLE_API_KEY\" has not been made; echo please go to \"settings \> secrets \> actions\" to create it"'
-
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         env:
