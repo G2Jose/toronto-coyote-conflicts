@@ -26,10 +26,19 @@ export default function Home() {
     setMounted(true)
   }, [setAttacks, setFilteredAttacks])
 
-  // Collapse list when an incident is selected
+  // Expand list and scroll to incident when selected from map
   useEffect(() => {
     if (selectedIncidentId) {
-      setIsListExpanded(false)
+      setIsListExpanded(true)
+      // Add a small delay to ensure the list is expanded before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(
+          `incident-${selectedIncidentId}`
+        )
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 300)
     }
   }, [selectedIncidentId])
 

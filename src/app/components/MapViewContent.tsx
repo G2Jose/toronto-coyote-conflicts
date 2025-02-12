@@ -96,9 +96,6 @@ export function MapViewContent({
   mapOptions,
   filteredAttacks,
 }: MapViewContentProps) {
-  const [selectedIncident, setSelectedIncident] = useState<Incident | null>(
-    null
-  )
   const { selectedIncidentId, setSelectedIncidentId } = useAttackStore()
 
   // Store map reference when mounted
@@ -136,7 +133,6 @@ export function MapViewContent({
                 eventHandlers={{
                   click: () => {
                     setSelectedIncidentId(attack.id)
-                    setSelectedIncident(attack)
                   },
                 }}
                 opacity={isSelected ? 1 : 0.6}
@@ -185,42 +181,6 @@ export function MapViewContent({
           </Button>
         </div>
       </div>
-
-      <Drawer.Root
-        open={selectedIncident !== null}
-        onOpenChange={(open) => !open && setSelectedIncident(null)}
-      >
-        <Drawer.Portal>
-          <Drawer.Overlay
-            className="fixed inset-0 bg-black/40"
-            style={{ zIndex: 1000 }}
-          />
-          <Drawer.Content
-            className="fixed bottom-0 right-0 mt-24 flex h-[96%] w-96 flex-col rounded-l-lg border bg-background md:h-full"
-            style={{ zIndex: 1000 }}
-          >
-            <div className="flex-1 overflow-auto">
-              <Drawer.Title className="sr-only">
-                {selectedIncident
-                  ? `Incident at ${selectedIncident.location}`
-                  : 'Incident Details'}
-              </Drawer.Title>
-              {selectedIncident && (
-                <IncidentDetails incident={selectedIncident} />
-              )}
-            </div>
-            <div className="p-4">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setSelectedIncident(null)}
-              >
-                Close
-              </Button>
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
     </>
   )
 }

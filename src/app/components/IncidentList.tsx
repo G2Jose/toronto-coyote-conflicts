@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { cn } from '@/lib/utils'
 
 function FilterBar() {
   const {
@@ -129,9 +130,15 @@ function IncidentCard({ incident }: { incident: Incident }) {
 
   return (
     <div
-      className={`border rounded-lg p-3 lg:p-4 hover:border-primary transition-all cursor-pointer ${
-        isSelected ? 'border-primary bg-muted' : ''
-      }`}
+      id={`incident-${incident.id}`}
+      className={cn(
+        'border rounded-lg p-3 lg:p-4 transition-all cursor-pointer',
+        'hover:border-primary/50 hover:bg-muted/50',
+        isSelected && [
+          'border-2 border-white bg-muted',
+          'shadow-[0_0_0_1px] shadow-primary',
+        ]
+      )}
       onClick={() => setSelectedIncidentId(isSelected ? null : incident.id)}
     >
       <div className="flex justify-between items-start mb-2">
