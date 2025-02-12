@@ -6,6 +6,7 @@ import { IncidentList } from './components/IncidentList'
 import { useAttackStore, fetchAttacks } from './store/attackStore'
 import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function Home() {
   const {
@@ -16,18 +17,41 @@ export default function Home() {
   } = useAttackStore()
   const [mounted, setMounted] = useState(false)
   const [isListExpanded, setIsListExpanded] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
+  // Load incidents and handle initial URL params
   useEffect(() => {
     const loadAttacks = async () => {
       const attacks = await fetchAttacks()
       setAttacks(attacks)
       setFilteredAttacks(attacks)
+
+      // Check for incident ID in URL
+      const incidentId = searchParams.get('incident')
+      if (incidentId && attacks.some((a) => a.id === incidentId)) {
+        setSelectedIncidentId(incidentId)
+        setIsListExpanded(true)
+      }
     }
     loadAttacks()
     setMounted(true)
-  }, [setAttacks, setFilteredAttacks])
+  }, [setAttacks, setFilteredAttacks, searchParams, setSelectedIncidentId])
 
-  // Expand list and scroll to incident when selected from map
+  // Update URL when selected incident changes
+  useEffect(() => {
+    if (!mounted) return
+
+    const url = new URL(window.location.href)
+    if (selectedIncidentId) {
+      url.searchParams.set('incident', selectedIncidentId)
+    } else {
+      url.searchParams.delete('incident')
+    }
+    router.replace(url.pathname + url.search)
+  }, [selectedIncidentId, mounted, router])
+
+  // Expand list and scroll to incident when selected from map or URL
   useEffect(() => {
     if (selectedIncidentId) {
       setIsListExpanded(true)

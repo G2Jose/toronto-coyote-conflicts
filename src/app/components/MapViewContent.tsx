@@ -121,7 +121,7 @@ export function MapViewContent({
                 radius={8}
                 pathOptions={{
                   fillColor:
-                    selectedIncidentId === incident.id ? '#ef4444' : 'red',
+                    selectedIncidentId === incident.id ? 'blue' : 'red',
                   fillOpacity: 1,
                   color: 'white',
                   weight: 1,
