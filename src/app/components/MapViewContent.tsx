@@ -1,6 +1,12 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import {
+  MapContainer,
+  TileLayer,
+  Popup,
+  useMap,
+  CircleMarker,
+} from 'react-leaflet'
 import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/attackStore'
 import { Button } from '@/components/ui/button'
@@ -10,7 +16,6 @@ import 'leaflet/dist/leaflet.css'
 import { formatDate } from '@/app/utils'
 import { useAttackStore } from '../store/attackStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
-import L from 'leaflet'
 
 declare global {
   interface Window {
@@ -62,29 +67,6 @@ interface MapViewContentProps {
   filteredAttacks: Incident[]
 }
 
-// Define marker icons
-const defaultIcon = new L.Icon({
-  iconUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
-const selectedIcon = new L.Icon({
-  iconUrl:
-    'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-})
-
 export function MapViewContent({
   mapOptions,
   filteredAttacks,
@@ -133,14 +115,17 @@ export function MapViewContent({
             const offsetY = totalIncidents > 1 ? Math.sin(angle) * radius : 0
 
             return (
-              <Marker
+              <CircleMarker
                 key={incident.id}
-                position={[lat + offsetY, lng + offsetX]}
-                icon={
-                  selectedIncidentId === incident.id
-                    ? selectedIcon
-                    : defaultIcon
-                }
+                center={[lat + offsetY, lng + offsetX]}
+                radius={8}
+                pathOptions={{
+                  fillColor:
+                    selectedIncidentId === incident.id ? '#ef4444' : 'red',
+                  fillOpacity: 1,
+                  color: 'white',
+                  weight: 1,
+                }}
                 eventHandlers={{
                   click: () => {
                     setSelectedIncidentId(incident.id)
@@ -157,7 +142,7 @@ export function MapViewContent({
                     )}
                   </div>
                 </Popup>
-              </Marker>
+              </CircleMarker>
             )
           })
         })}

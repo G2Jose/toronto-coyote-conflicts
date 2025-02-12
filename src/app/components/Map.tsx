@@ -1,6 +1,6 @@
 'use client'
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet'
 import type { Incident } from '../store/attackStore'
 import type { MapOptions } from 'leaflet'
 import { Drawer } from 'vaul'
@@ -53,8 +53,15 @@ export function Map({ mapOptions, style, coordinates, incident }: MapProps) {
       <div className="relative h-full">
         <MapContainer {...mapOptions} style={style}>
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          <Marker
-            position={[lat, lng]}
+          <CircleMarker
+            center={[lat, lng]}
+            radius={8}
+            pathOptions={{
+              fillColor: '#f87171',
+              fillOpacity: 1,
+              color: 'white',
+              weight: 2,
+            }}
             eventHandlers={{
               click: () => setIsDetailsOpen(true),
             }}
@@ -65,7 +72,7 @@ export function Map({ mapOptions, style, coordinates, incident }: MapProps) {
                 <p>{incident.time}</p>
               </div>
             </Popup>
-          </Marker>
+          </CircleMarker>
         </MapContainer>
       </div>
 
