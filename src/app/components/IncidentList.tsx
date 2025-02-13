@@ -41,8 +41,8 @@ function FilterBar() {
   }, [attacks])
 
   const sortOptions = {
-    'date-desc': 'Most Recent',
-    'date-asc': 'Oldest First',
+    'datetime-desc': 'Most Recent',
+    'datetime-asc': 'Oldest First',
     'dogBreed-asc': 'Dog Breed (A-Z)',
     'dogBreed-desc': 'Dog Breed (Z-A)',
     'numCoyotes-desc': 'Most Coyotes',
@@ -218,11 +218,21 @@ function IncidentCard({ incident }: { incident: Incident }) {
           {incident.notes}
         </div>
       )}
-      {isSelected && incident.coordinates && (
-        <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
-          <span className="text-muted-foreground">Location:</span>{' '}
-          {incident.coordinates}
-        </div>
+      {isSelected && (
+        <>
+          {incident.coordinates && (
+            <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
+              <span className="text-muted-foreground">Location:</span>{' '}
+              {incident.coordinates}
+            </div>
+          )}
+          {incident.source && (
+            <div className="text-xs lg:text-sm text-muted-foreground mt-2 lg:mt-3">
+              <span className="text-muted-foreground">Source:</span>{' '}
+              {incident.source}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

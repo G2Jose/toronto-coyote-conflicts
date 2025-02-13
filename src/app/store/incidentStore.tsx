@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import Airtable from 'airtable'
+import dayjs from 'dayjs'
 
 export interface Incident {
   id: string
@@ -13,9 +14,10 @@ export interface Incident {
   coordinates?: string // Format: "lat,lng"
   notes?: string
   dogInjured: string
+  source?: string
 }
 
-export type SortField = 'date' | 'dogBreed' | 'dogWeightLb' | 'numCoyotes'
+export type SortField = 'datetime' | 'dogBreed' | 'dogWeightLb' | 'numCoyotes'
 type SortOrder = 'asc' | 'desc'
 type Filters = {
   dogBreed?: string
@@ -41,13 +43,22 @@ export const incidentStore = create<AttackStore>((set) => ({
   setIncidents: (attacks) => set({ incidents: attacks }),
   selectedIncidentId: null,
   setSelectedIncidentId: (id) => set({ selectedIncidentId: id }),
-  sortField: 'date',
+  sortField: 'datetime',
   setSortField: (field) => set({ sortField: field }),
   sortOrder: 'desc',
   setSortOrder: (order) => set({ sortOrder: order }),
   filters: {},
   setFilters: (filters) => set({ filters }),
 }))
+
+// Helper function to combine date and time into a single Date object
+export const getDateTime = (incident: Incident): Date | null => {
+  if (!incident.date) return null
+  const dateStr = incident.date
+  const timeStr = incident.time || '00:00' // Default to midnight if no time provided
+  const date = dayjs(`${dateStr} ${timeStr}`)
+  return date.isValid() ? date.toDate() : null
+}
 
 // Selector function to get filtered and sorted incidents
 export const getFilteredIncidents = (state: AttackStore): Incident[] => {
@@ -69,18 +80,27 @@ export const getFilteredIncidents = (state: AttackStore): Incident[] => {
 
   // Apply sorting
   result.sort((a, b) => {
+    if (sortField === 'datetime') {
+      const aDate = getDateTime(a)
+      const bDate = getDateTime(b)
+
+      // If both dates are null/invalid, maintain original order
+      if (!aDate && !bDate) return 0
+      // Push null/invalid dates to the end
+      if (!aDate) return 1
+      if (!bDate) return -1
+
+      return sortOrder === 'desc'
+        ? bDate.getTime() - aDate.getTime()
+        : aDate.getTime() - bDate.getTime()
+    }
+
     const aVal = a[sortField]
     const bVal = b[sortField]
 
     if (!aVal && !bVal) return 0
     if (!aVal) return 1
     if (!bVal) return -1
-
-    if (sortField === 'date') {
-      return sortOrder === 'desc'
-        ? new Date(bVal).getTime() - new Date(aVal).getTime()
-        : new Date(aVal).getTime() - new Date(bVal).getTime()
-    }
 
     return sortOrder === 'desc'
       ? String(bVal).localeCompare(String(aVal))
@@ -119,6 +139,7 @@ export const fetchAttacks = async (): Promise<Incident[]> => {
         numCoyotes: record.get('Number of coyotes') as number,
         notes: record.get('Notes') as string | undefined,
         dogInjured: record.get('Dog injured') as string,
+        source: record.get('Source') as string | undefined,
       }
     })
   } catch (error) {
