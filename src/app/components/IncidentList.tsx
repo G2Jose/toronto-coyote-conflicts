@@ -30,6 +30,16 @@ function FilterBar() {
     return Array.from(breeds).sort()
   }, [attacks])
 
+  const uniqueLeashStatuses = useMemo(() => {
+    const statuses = new Set(attacks.map((i) => i.wasLeashed).filter(Boolean))
+    return Array.from(statuses).sort()
+  }, [attacks])
+
+  const uniqueInjuryStatuses = useMemo(() => {
+    const statuses = new Set(attacks.map((i) => i.dogInjured).filter(Boolean))
+    return Array.from(statuses).sort()
+  }, [attacks])
+
   const sortOptions = {
     'date-desc': 'Most Recent',
     'date-asc': 'Oldest First',
@@ -74,9 +84,12 @@ function FilterBar() {
           <SelectValue placeholder="Leash status..." />
         </SelectTrigger>
         <SelectContent position="popper">
-          <SelectItem value="all">Leashed & Unleashed</SelectItem>
-          <SelectItem value="Yes">Leashed Only</SelectItem>
-          <SelectItem value="No">Unleashed Only</SelectItem>
+          <SelectItem value="all">All Leash Statuses</SelectItem>
+          {uniqueLeashStatuses.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -115,9 +128,12 @@ function FilterBar() {
           <SelectValue placeholder="Dog injured..." />
         </SelectTrigger>
         <SelectContent position="popper">
-          <SelectItem value="all">All Incidents</SelectItem>
-          <SelectItem value="Yes">Dog Injured</SelectItem>
-          <SelectItem value="No">Dog Not Injured</SelectItem>
+          <SelectItem value="all">All Injury Statuses</SelectItem>
+          {uniqueInjuryStatuses.map((status) => (
+            <SelectItem key={status} value={status}>
+              {status}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
