@@ -1,19 +1,11 @@
 'use client'
-
-import {
-  MapContainer,
-  TileLayer,
-  Popup,
-  useMap,
-  CircleMarker,
-} from 'react-leaflet'
+import { MapContainer, TileLayer, useMap, CircleMarker } from 'react-leaflet'
 import type { MapOptions } from 'leaflet'
 import type { Incident } from '../store/incidentStore'
 import { Button } from '@/components/ui/button'
 import { Locate } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { formatDate } from '@/app/utils'
 import { incidentStore } from '../store/incidentStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
 
