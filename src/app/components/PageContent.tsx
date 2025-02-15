@@ -91,10 +91,7 @@ export function PageContent() {
               variant="link"
               size="sm"
               onClick={() =>
-                window.open(
-                  'https://a90p93n2o50.typeform.com/to/Wd7fhYBO',
-                  '_blank'
-                )
+                window.open('https://www.facebook.com/sailorr.moon.7', '_blank')
               }
               className="text-primary hover:text-primary/90 p-0 h-auto w-fit font-medium"
             >
