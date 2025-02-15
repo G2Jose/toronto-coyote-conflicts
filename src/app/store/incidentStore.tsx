@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import Airtable from 'airtable'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { fetchIncidents } from '@/app/store/fetchData'
 
 dayjs.extend(customParseFormat)
 
@@ -122,19 +122,8 @@ export const getFilteredIncidents = (state: AttackStore): Incident[] => {
 }
 
 export const fetchAttacks = async (): Promise<Incident[]> => {
-  const apiKey = process.env.NEXT_PUBLIC_AIRTABLE_API_KEY
-  const baseId = process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID
-  const tableId = process.env.NEXT_PUBLIC_AIRTABLE_TABLE_ID
-
-  if (!apiKey || !baseId || !tableId) {
-    return []
-  }
-
-  const base = new Airtable({
-    apiKey,
-  }).base(baseId)
   try {
-    const records = await base(tableId).select().all()
+    const records = await fetchIncidents()
 
     return records
       .map((record) => {
