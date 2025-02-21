@@ -24,6 +24,8 @@ The Airtable base contains the following data:
 | Source                 | ❌           | Text                                     | FB CityPlace Dog Owners Group            |
 | Publish                | ✅           | Checkbox (must be checked to appear online)     | ✅                           |
 | Incident type          | ✅           | One of: 'Coyote attack on a dog (attempt)', 'Coyote attack on a dog (successful)', 'Stalked by a coyote', 'Coyote attack on a human' | 'Coyote attack on a dog (attempt)' |
+| First name             | ❌           | Text                      (for users who agree to being contacted for followup information)                | John                         | 
+| Email                  | ❌           | Text               (for users who agree to being contacted for followup information)                       | john@example.com                        | 
 
 
 ### Adding New Incidents
