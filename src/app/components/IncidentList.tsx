@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 function FilterBar() {
   const {
@@ -24,6 +26,8 @@ function FilterBar() {
     filters,
     setFilters,
   } = incidentStore()
+
+  const hasActiveFilters = Object.values(filters).some(Boolean)
 
   const uniqueLeashStatuses = useMemo(() => {
     const statuses = new Set(attacks.map((i) => i.wasLeashed).filter(Boolean))
@@ -49,7 +53,7 @@ function FilterBar() {
   } as const
 
   return (
-    <div className="flex flex-wrap gap-2 mb-3">
+    <div className="flex flex-wrap items-center gap-2 mb-3">
       <Select
         value={`${sortField}-${sortOrder}`}
         onValueChange={(value: string) => {
@@ -125,6 +129,22 @@ function FilterBar() {
           ))}
         </SelectContent>
       </Select>
+
+      {hasActiveFilters && (
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            setFilters({})
+            setSortField('datetime')
+            setSortOrder('desc')
+          }}
+          className="shrink-0 border-destructive text-destructive hover:bg-destructive/10"
+          title="Clear all filters"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
     </div>
   )
 }
@@ -258,6 +278,10 @@ export function IncidentList() {
         />
       </div>
       <FilterBar />
+      <div className="text-sm text-muted-foreground mb-3 mx-2">
+        {searchFilteredIncidents.length}{' '}
+        {searchFilteredIncidents.length === 1 ? 'incident' : 'incidents'}
+      </div>
       <div className="space-y-3 lg:space-y-4">
         {searchFilteredIncidents.length === 0 ? (
           <div className="text-center text-muted-foreground py-8">
