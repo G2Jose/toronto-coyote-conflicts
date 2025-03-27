@@ -9,7 +9,8 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { formatDate } from '@/app/utils'
-import { MAP_TILE_LAYER } from '@/app/constants'
+import { getMapTileLayer } from '@/app/constants'
+import { useTheme } from 'next-themes'
 
 function IncidentDetails({ incident }: { incident: Incident }) {
   return (
@@ -48,12 +49,18 @@ interface MapProps {
 export function Map({ mapOptions, style, coordinates, incident }: MapProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [lat, lng] = coordinates.split(',').map(Number)
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  const mapTileLayer = getMapTileLayer(isDark)
 
   return (
     <>
       <div className="relative h-full">
         <MapContainer {...mapOptions} style={style}>
-          <TileLayer url={MAP_TILE_LAYER} />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url={mapTileLayer}
+          />
           <CircleMarker
             center={[lat, lng]}
             radius={8}
