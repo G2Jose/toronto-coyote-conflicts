@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { incidentStore } from '../store/incidentStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
+import { MAP_TILE_LAYER } from '@/app/constants'
 
 declare global {
   interface Window {
@@ -93,7 +94,7 @@ export function MapViewContent({
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url={MAP_TILE_LAYER}
         />
         {Array.from(markerGroups.entries()).map(([coords, incidents]) => {
           const [lat, lng] = coords.split(',').map(Number)

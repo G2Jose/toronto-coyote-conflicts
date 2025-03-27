@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { formatDate } from '@/app/utils'
+import { MAP_TILE_LAYER } from '@/app/constants'
 
 function IncidentDetails({ incident }: { incident: Incident }) {
   return (
@@ -52,7 +53,7 @@ export function Map({ mapOptions, style, coordinates, incident }: MapProps) {
     <>
       <div className="relative h-full">
         <MapContainer {...mapOptions} style={style}>
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+          <TileLayer url={MAP_TILE_LAYER} />
           <CircleMarker
             center={[lat, lng]}
             radius={8}
