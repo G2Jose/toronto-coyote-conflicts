@@ -8,7 +8,8 @@ import { useEffect, useMemo } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { incidentStore } from '../store/incidentStore'
 import type { LeafletEvent, LocationEvent } from 'leaflet'
-import { MAP_TILE_LAYER } from '@/app/constants'
+import { getMapTileLayer } from '../constants'
+import { useTheme } from 'next-themes'
 
 declare global {
   interface Window {
@@ -65,6 +66,9 @@ export function MapViewContent({
   filteredAttacks,
 }: MapViewContentProps) {
   const { selectedIncidentId, setSelectedIncidentId } = incidentStore()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+  const mapTileLayer = getMapTileLayer(isDark)
 
   // Group incidents by coordinates to handle overlapping markers
   const markerGroups = useMemo(() => {
@@ -88,13 +92,14 @@ export function MapViewContent({
   return (
     <div className="relative h-full w-full">
       <MapContainer
-        {...mapOptions}
+        center={[43.6532, -79.3832]}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
-        attributionControl={false}
+        {...mapOptions}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url={MAP_TILE_LAYER}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url={mapTileLayer}
         />
         {Array.from(markerGroups.entries()).map(([coords, incidents]) => {
           const [lat, lng] = coords.split(',').map(Number)

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from './theme-toggle'
 
 export function PageContent() {
   const {
@@ -83,22 +84,28 @@ export function PageContent() {
     <div className="min-h-screen bg-background">
       <header className="bg-card shadow-md">
         <div className="max-w-[2000px] mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-bold text-foreground">
-              Toronto Coyote Incidents
-            </h1>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() =>
-                window.open(
-                  "mailto:reports@torontocoyoteconflicts.ca?subject=Coyote%20Incident&body=Hi%20I'd%20like%20to%20report%20the%20following%20incident%3A%0A%0A*%20Date%3A%20%0A*%20Time%3A%20%0A*%20Location%3A%20%0A*%20Incident%20type%20(coyote%20attack%20on%20dog%20-%20successful%2C%20coyote%20attack%20on%20dog%20-%20attempt%2C%20coyote%20attack%20on%20human%2C%20stalked%20by%20coyote)%3A%20%0A%0AIf%20involving%20a%20dog%0A*%20Dog%20injured%20(yes%20%2F%20no)%3A%20%0A*%20Dog%20leashed%20(yes%20%2F%20no)%3A%20%0A*%20Dog%20breed%3A%20%0A*%20Approx%20dog%20weight%20(lb)%3A%20%0A%0ASequence%20of%20events%3A%20%0A%0AI%20don't%20mind%20being%20contacted%20for%20any%20followup%20questions%20(yes%20%2F%20no)%3A%20%0A%0A"
-                )
-              }
-              className="text-primary hover:text-primary/90 p-0 h-auto w-fit font-medium"
-            >
-              Report an incident →
-            </Button>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold text-foreground">
+                Toronto Coyote Incidents
+              </h1>
+              <div className="flex items-center gap-4">
+                <ThemeToggle />
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-foreground hover:text-primary"
+                  onClick={() =>
+                    window.open(
+                      'https://form.typeform.com/to/your-form-id',
+                      '_blank'
+                    )
+                  }
+                >
+                  Report an Incident →
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
