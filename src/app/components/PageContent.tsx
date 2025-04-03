@@ -84,32 +84,53 @@ export function PageContent() {
     <div className="min-h-screen bg-background">
       <header className="bg-card shadow-md">
         <div className="max-w-[2000px] mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold text-foreground">
                 Toronto Coyote Incidents
               </h1>
-              <div className="flex items-center gap-4">
-                <ThemeToggle />
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="text-foreground hover:text-primary"
-                  onClick={() =>
-                    window.open(
-                      "mailto:reports@torontocoyoteconflicts.ca?subject=Coyote%20Incident&body=Hi%20I'd%20like%20to%20report%20the%20following%20incident%3A%0A%0A*%20Date%3A%20%0A*%20Time%3A%20%0A*%20Location%3A%20%0A*%20Incident%20type%20(coyote%20attack%20on%20dog%20-%20successful%2C%20coyote%20attack%20on%20dog%20-%20attempt%2C%20coyote%20attack%20on%20human%2C%20stalked%20by%20coyote)%3A%20%0A%0AIf%20involving%20a%20dog%0A*%20Dog%20injured%20(yes%20%2F%20no)%3A%20%0A*%20Dog%20leashed%20(yes%20%2F%20no)%3A%20%0A*%20Dog%20breed%3A%20%0A*%20Approx%20dog%20weight%20(lb)%3A%20%0A%0ASequence%20of%20events%3A%20%0A%0AI%20don't%20mind%20being%20contacted%20for%20any%20followup%20questions%20(yes%20%2F%20no)%3A%20%0A%0A"
-                    )
-                  }
-                >
-                  Report an Incident →
-                </Button>
+              <ThemeToggle />
+            </div>
+            <div className="flex justify-start">
+              <Button
+                variant="link"
+                size="sm"
+                className="text-foreground hover:text-primary m-0 p-0"
+                onClick={() =>
+                  window.open(
+                    'https://tracker.coyotesafetytoronto.ca/app/csc#/incidents/new'
+                  )
+                }
+              >
+                Report an Incident →
+              </Button>
+            </div>
+
+            <div className="mt-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 p-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2">
+                  <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-amber-500/40 dark:bg-amber-500/20"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-500/60"></span>
+                </span>
+                <span>
+                  This app is not currently maintained. For the latest data,
+                  please visit{' '}
+                  <a
+                    href="https://tracker.coyotesafetytoronto.ca/app/csc"
+                    className="text-muted-foreground hover:text-foreground hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    tracker.coyotesafetytoronto.ca
+                  </a>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </header>
+
       <main className="max-w-[2000px] mx-auto h-[calc(100vh-104px)]">
-        {/* Mobile Layout (map with expanding list) */}
         <div className="block lg:hidden h-full relative">
           <div className="h-full">
             <MapView />
